@@ -4,6 +4,7 @@ workflows:
   ci:
     jobs:
     - sea
+    - invoicing_app
 jobs:
   sea:
     docker:
@@ -15,3 +16,14 @@ jobs:
       - run: rake test
       - run: rubocop
       - run: bash <(curl -s https://codecov.io/bash)
+  invoicing_app:
+    docker:
+      - image: circleci/ruby:2.4.1
+    environment:
+      - MIX_ENV: test
+    working_directory: ~/repo/examples/invoicing_app
+    steps:
+      - checkout:
+          path: ~/repo
+      - run: bundle install
+      - run: rake test
