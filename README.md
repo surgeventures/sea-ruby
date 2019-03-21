@@ -1,6 +1,6 @@
 # Sea for Ruby
 
-[![License badge](https://img.shields.io/github/license/surgeventures/sea-ruby.svg)](https://github.com/surgeventures/sea-elixir/blob/master/LICENSE.md)
+[![License badge](https://img.shields.io/github/license/surgeventures/sea-ruby.svg)](https://github.com/surgeventures/sea-ruby/blob/master/LICENSE.md)
 [![Build status badge](https://img.shields.io/circleci/project/github/surgeventures/sea-ruby/master.svg)](https://circleci.com/gh/surgeventures/sea-ruby/tree/master)
 [![Code coverage badge](https://img.shields.io/codecov/c/github/surgeventures/sea-ruby/master.svg)](https://codecov.io/gh/surgeventures/sea-ruby/branch/master)
 
