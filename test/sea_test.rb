@@ -15,6 +15,34 @@ class SeaTest < Minitest::Test
       assert_equal ["SeaTest::Mod1", "SeaTest::Mod2"], ChildSignal.send(:observers)
     end
 
+    it "allows to namespace observers" do
+      class NamespacedObserverSignal < Sea::Signal
+        emit_to ["Mod1", "Mod2"], in: "SeaTest"
+      end
+
+      assert_equal ["SeaTest::Mod1", "SeaTest::Mod2"], NamespacedObserverSignal.send(:observers)
+    end
+
+    it "fails to namespace observers when passing const" do
+      error = assert_raises ArgumentError do
+        class NamespacedObserverCostSignal < Sea::Signal
+          emit_to String, in: "SeaTest"
+        end
+      end
+
+      assert_match "expected namespaced observer name, got: String", error.message
+    end
+
+    it "fails to namespace observers on invalid namespace type" do
+      error = assert_raises ArgumentError do
+        class NamespacedObserverCostSignal < Sea::Signal
+          emit_to "Mod1", in: 1
+        end
+      end
+
+      assert_match "expected namespace name, got: 1", error.message
+    end
+
     it "raises on duplicate observer" do
       error = assert_raises ArgumentError do
         class DuplicateObserverSignal < Sea::Signal
@@ -33,7 +61,7 @@ class SeaTest < Minitest::Test
         end
       end
 
-      assert_match "expected observer class/module or string, got: 1", error.message
+      assert_match "expected observer class/module/name, got: 1", error.message
     end
   end
 
