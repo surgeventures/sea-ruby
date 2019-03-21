@@ -1,0 +1,17 @@
+version: 2
+workflows:
+  version: 2
+  ci:
+    jobs:
+    - sea
+jobs:
+  sea:
+    docker:
+      - image: circleci/ruby:2.4.1
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: bundle install
+      - run: rake test
+      - run: rubocop
+      - run: bash <(curl -s https://codecov.io/bash)
