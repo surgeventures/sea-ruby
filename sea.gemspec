@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.test_files       = spec.files.grep(%r{^(test)/})
   spec.require_paths    = ['lib']
 
-  spec.add_development_dependency "codecov", "~> 0.1"
+  spec.add_development_dependency 'codecov', '~> 0.1'
   spec.add_development_dependency 'minitest', '~> 5.11'
   spec.add_development_dependency 'rubocop', '~> 0.66'
   spec.add_development_dependency 'simplecov', '~> 0.16'
