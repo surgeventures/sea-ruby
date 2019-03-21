@@ -1,5 +1,22 @@
 require 'sea'
 
+module SignalRouter
+  module SingleObserver
+    def handle_signal(signal)
+      observer = self.const_get("Observer")
+      observer.handle_signal(signal)
+    end
+  end
+
+  module OneSignalOneObserver
+    def handle_signal(signal)
+      observer_name = signal.class.to_s.split("::").last.sub(/Signal$/, "Observer")
+      observer = self.const_get(observer_name)
+      observer.handle_signal(signal)
+    end
+  end
+end
+
 module Sales
   module_function
   def create_invoice(appointment_id)
@@ -44,14 +61,7 @@ module Sales
   end
 
   class InvoiceCreatedSignal < Sea::Signal
-    emit_within %w[Calendar Customers Inventory Analytics]
-
-    # ...or if we don't care about naming convention:
-    #
-    # emit_to "Calendar::InvoiceCreatedObserver"
-    # emit_to "Customers::InvoiceCreatedObserver"
-    # emit_to "Inventory::InvoiceCreatedObserver"
-    # emit_to "Analytics::InvoiceCreatedObserver"
+    emit_to %w[Calendar Customers Inventory Analytics]
 
     attr_reader :provider_id, :appointment_id, :customer_id, :product_ids
 
@@ -65,6 +75,8 @@ module Sales
 end
 
 module Calendar
+  extend SignalRouter::OneSignalOneObserver
+
   module_function
   def get_appointment(id)
     Appointment.find(id)
@@ -109,7 +121,7 @@ module Calendar
   end
 
   class AppointmentCompletedSignal < Sea::Signal
-    emit_within %w[Customers Analytics]
+    emit_to %w[Customers Analytics]
 
     attr_reader :provider_id, :customer_id
 
@@ -120,7 +132,7 @@ module Calendar
   end
 
   class InvoiceCreatedObserver < Sea::Observer
-    def call
+    def handle_signal
       appointment = Appointment.find(signal.appointment_id)
       CompleteAppointmentService.new(appointment).call
     end
@@ -128,6 +140,8 @@ module Calendar
 end
 
 module Customers
+  extend SignalRouter::OneSignalOneObserver
+
   class Customer
     attr_accessor :id, :active, :confirmed
 
@@ -168,14 +182,14 @@ module Customers
   end
 
   class InvoiceCreatedObserver < Sea::Observer
-    def call
+    def handle_signal
       customer = Customer.find(signal.customer_id)
       MarkCustomerActiveService.new(customer).call
     end
   end
 
   class AppointmentCompletedObserver < Sea::Observer
-    def call
+    def handle_signal
       customer = Customer.find(signal.customer_id)
       MarkCustomerConfirmedService.new(customer).call
     end
@@ -183,6 +197,8 @@ module Customers
 end
 
 module Inventory
+  extend SignalRouter::OneSignalOneObserver
+
   class DecreaseInvoicedStockService
     def initialize(product_ids)
       @product_ids = product_ids
@@ -196,13 +212,15 @@ module Inventory
   end
 
   class InvoiceCreatedObserver < Sea::Observer
-    def call
+    def handle_signal
       DecreaseInvoicedStockService.new(signal.product_ids).call
     end
   end
 end
 
 module Analytics
+  extend SignalRouter::SingleObserver
+
   class IncreaseInvoiceAccumulatorService
     def initialize(provider_id)
       @provider_id = provider_id
@@ -227,15 +245,13 @@ module Analytics
     end
   end
 
-  class InvoiceCreatedObserver < Sea::Observer
-    def call
-      IncreaseInvoiceAccumulatorService.new(signal.provider_id).call
-    end
-  end
-
-  class AppointmentCompletedObserver < Sea::Observer
-    def call
-      IncreaseCompletedAppointmentAccumulatorService.new(signal.provider_id).call
+  class Observer < Sea::Observer
+    def handle_signal
+      if signal.is_a?(Sales::InvoiceCreatedSignal)
+        IncreaseInvoiceAccumulatorService.new(signal.provider_id).call
+      elsif signal.is_a?(Calendar::AppointmentCompletedSignal)
+        IncreaseCompletedAppointmentAccumulatorService.new(signal.provider_id).call
+      end
     end
   end
 end
