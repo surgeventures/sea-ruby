@@ -19,6 +19,10 @@ class Signal
       end
     end
 
+    def inherited(child)
+      child.emit_to(observers)
+    end
+
     private
 
     def check_observer_type(o)
