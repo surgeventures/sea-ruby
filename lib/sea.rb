@@ -1,3 +1,3 @@
-require "sea/version"
-require "sea/signal"
-require "sea/observer"
+require 'sea/version'
+require 'sea/signal'
+require 'sea/observer'

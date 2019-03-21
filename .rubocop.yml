@@ -1,0 +1,7 @@
+AllCops:
+  Exclude:
+    - 'examples/**/*.rb'
+    - 'test/**/*.rb'
+
+Metrics/LineLength:
+  Max: 100
