@@ -36,10 +36,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  minitest (~> 5.1)
-  rubocop
+  minitest (~> 5.11)
+  rubocop (~> 0.66)
   sea!
-  simplecov
+  simplecov (~> 0.16)
 
 BUNDLED WITH
    1.16.5
