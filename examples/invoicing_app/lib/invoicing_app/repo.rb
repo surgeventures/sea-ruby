@@ -19,27 +19,20 @@ module InvoicingApp
         schema = record.class
         schema_definition = schema.schema_definition
         now = DateTime.now
-        if schema_definition.fields.include?(:inserted_at)
-          record.inserted_at = now
-        end
-       if schema_definition.fields.include?(:updated_at)
-          record.updated_at = now
-        end
+        record.inserted_at = now if schema_definition.fields.include?(:inserted_at)
+        record.updated_at = now if schema_definition.fields.include?(:updated_at)
         dataset = dataset(schema)
         fields = schema_definition.fields - [:id]
         field_values = fields.map { |f| [f, record.send(f)] }.to_h
         id = dataset.insert(field_values)
         record.id = id
-
         record
       end
 
       def update(record)
         schema = record.class
         schema_definition = schema.schema_definition
-        if schema_definition.fields.include?(:updated_at)
-          record.updated_at = DateTime.now
-        end
+        record.updated_at = DateTime.now if schema_definition.fields.include?(:updated_at)
         dataset = dataset(schema)
         fields = schema.schema_definition.fields - [:id]
         field_values = fields.map { |f| [f, record.send(f)] }.to_h
@@ -50,9 +43,7 @@ module InvoicingApp
         schema = record.class
         schema_definition = schema.schema_definition
         record.send("#{field}=", record.send(field) + amount)
-        if schema_definition.fields.include?(:updated_at)
-          record.updated_at = DateTime.now
-        end
+        record.updated_at = DateTime.now if schema_definition.fields.include?(:updated_at)
         dataset = dataset(schema)
         dataset.where(id: record.id).update(field => Sequel[field] + amount)
       end
