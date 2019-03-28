@@ -19,6 +19,7 @@ jobs:
   invoicing_app:
     docker:
       - image: circleci/ruby:2.4.1
+      - image: circleci/postgres:10.6-alpine
     environment:
       - MIX_ENV: test
     working_directory: ~/repo/examples/invoicing_app
