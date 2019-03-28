@@ -2,7 +2,7 @@ module InvoicingApp
   module Inventory
     class InvoiceCreatedObserver < Sea::Observer
       def handle_signal
-        puts "[Inventory] Stock for product #{signal.product_id} decreased"
+        IncreaseStockService.new(signal.product_id, -1).call
       end
     end
   end

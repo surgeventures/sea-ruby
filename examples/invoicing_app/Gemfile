@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'minitest'
+gem 'pg'
 gem 'rake'
 gem 'sea', path: '../..'
+gem 'sequel'

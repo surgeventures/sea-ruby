@@ -7,22 +7,18 @@ module InvoicingApp
       end
 
       def call
-        # begin transaction
+        invoice = Repo.transaction do
+          invoice = Invoice.new
+          invoice.generate_number
+          invoice.product_id = @product_id
+          invoice.customer_id = @customer_id
 
-        invoice = Invoice.new
-        invoice.number = sprintf("%06d", rand * 1_000_000)
-        invoice.product_id = @product_id
-        invoice.customer_id = @customer_id
+          invoice = Repo.insert(invoice)
 
-        puts "[Sales] Invoice #{invoice.number} built"
+          InvoiceCreatedSignal.new(invoice).emit
 
-        invoice.save
-
-        InvoiceCreatedSignal.new(invoice).emit
-
-        # commit transaction
-
-        puts "[Sales] Invoice #{invoice.id} persisted along with side-effects"
+          invoice
+        end
 
         invoice
       end

@@ -1,10 +1,16 @@
 module InvoicingApp
   module Sales
-    class Invoice
-      attr_accessor :id, :number, :customer_id, :product_id
+    class Invoice < Schema
+      schema "sales_invoices" do
+        field :number
+        field :customer_id
+        field :product_id
 
-      def save
-        self.id = (rand * 1000 + 1).round
+        timestamps
+      end
+
+      def generate_number
+        self.number = sprintf("%06d", rand * 1_000_000)
       end
     end
   end

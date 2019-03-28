@@ -7,15 +7,19 @@ GEM
   remote: https://rubygems.org/
   specs:
     minitest (5.11.3)
+    pg (1.1.4)
     rake (12.3.2)
+    sequel (5.18.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   minitest
+  pg
   rake
   sea!
+  sequel
 
 BUNDLED WITH
    1.16.5
